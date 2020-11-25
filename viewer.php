@@ -20,6 +20,9 @@ function processEDOSch301(SimpleXMLElement $xml) {
 	$provider = $doc->Поставщик;
 	$customer = $doc->Покупатель;
 	$invoce = $doc->ТаблДок;
+	$total = $invoce->ИтогТабл;
+	$totalVat = $total->НДС;
+	$hasVat = !empty($totalVat) && !empty((float)$totalVat['СУММА']);
 ?>
 	<article>
 		TODO: таблица реквизитов
@@ -48,6 +51,20 @@ function processEDOSch301(SimpleXMLElement $xml) {
 			<?php endforeach; ?>
 		</table>
 
+		<table>
+			<tr>
+				<td>Итого:</td>
+				<td><?=$total['Сумма'];?></td>
+			</tr>
+			<tr>
+				<td>В том числе НДС:</td>
+				<td><?=$hasVat ? $totalVat['СУММА'] : '-';?></td>
+			</tr>
+			<tr>
+				<td>Всего к оплате:</td>
+				<td><?=$total['Сумма'];?></td>
+			</tr>
+		</table>
 	</article>
 <?php
 }
