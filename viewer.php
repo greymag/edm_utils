@@ -4,16 +4,16 @@ $filename = 'ON_SCHET___20201029_0d1c7e82-857c-4df0-b7fd-5b13e73f354f.xml';
 
 $xml = simplexml_load_file(__DIR__ . '/' . $filename);
 
-processEDOSch($xml);
+processEDOSch301($xml);
 
 /**
  * Парсит и выводит в нормально виде ЭДОСч (счет)
- * https://sbis.ru/formats/docFormatCardEdo/1222/format/
+ * https://sbis.ru/formats/docFormatCardEdo/47273/format/
  */
-function processEDOSch(SimpleXMLElement $xml) {
+function processEDOSch301(SimpleXMLElement $xml) {
 	$name = $xml->getName();
-	if ($name != 'Файл' ||  $xml['Формат'] != 'ЭДОСч') {
-		die('Файл не соответсвует формату ЭДОСч');
+	if ($name != 'Файл' ||  $xml['Формат'] != 'ЭДОСч' || $xml['ВерсияФормата'] != '3.01') {
+		die('Файл не соответсвует формату ЭДОСч версии 3.01');
 	}
 
 	$doc = $xml->Документ;
