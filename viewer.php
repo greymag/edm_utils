@@ -27,6 +27,26 @@ function processEDOSch(SimpleXMLElement $xml) {
 		TODO: поставщик
 		TODO: покупатель
 		TODO: Основание
+		<table>
+			<tr>
+				<th>№</th>
+				<th>Код</th>
+				<th>Товары</th>
+				<th>Кол-во</th>
+				<th>Цена</th>
+				<th>Сумма</th>
+			</tr>
+			<?php foreach ($invoce->СтрТабл as $entry): ?>
+			<tr>
+				<td><?=$entry['ПорНомер'];?></td>
+				<td><?=$entry['Код'];?></td>
+				<td><?=$entry['Название'];?></td>
+				<td><?=$entry['Кол_во'];?></td>
+				<td><?=$entry['Цена'];?></td>
+				<td><?=$entry['Сумма'];?></td>
+			</tr>
+			<?php endforeach; ?>
+		</table>
 
 	</article>
 <?php
