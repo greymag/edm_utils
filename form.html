@@ -1,0 +1,21 @@
+<html>
+
+<head>
+    <title>Просмотр ЭДО</title>
+</head>
+
+<body>
+    <h1>Загрузите XML счета</h1>
+    <?php if (!empty($error)): ?>
+    <div><?=$error;?></div>
+    <?php endif; ?>
+    <form enctype="multipart/form-data" action="" method="POST">
+        <div>
+            <label for="xml">Файл счета</label>
+            <input id="xml" name="xml" type="file" accept="text/xml">
+        </div>
+        <button type="submit">Upload</button>
+    </form>
+</body>
+
+</html>
