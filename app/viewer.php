@@ -1,12 +1,38 @@
 <?php
+/**
+ * Требования:
+ * PHP 7
+ */
 
 $error = null;
 if (isset($_FILES['xml'])) {
-    $xml = uploadXml($_FILES['xml']);
-    
-    if (!empty($xml)) {
-    } else {
-        $error = 'Не удалось загрузить XML.';
+    $input = $_FILES['xml'];
+
+    $fileType = $input['type'];
+    $fileName = $input['name'];
+    $tmpPath = $input['tmp_name'];
+
+    switch ($fileType) {
+        case 'application/zip':
+            require_once __DIR__ . DIRECTORY_SEPARATOR . 'unzip.php';
+            $path = unzip_xml($tmpPath);
+            if (!empty($path)) {
+                $xml = loadXml($path);
+                if (empty($xml)) {
+                    $error = 'Не удалось загрузить XML из архива.';
+                }
+            } else {
+                $error = 'Не найден xml в архиве.';
+            }
+            break;
+        case 'text/xml':
+            $xml = loadXml($tmpPath);
+            if (empty($xml)) {
+                $error = 'Не удалось загрузить XML.';
+            }
+            break;
+        default:
+            $error = 'Неподдерживаемый тип файла.';
     }
 }
 
@@ -17,10 +43,8 @@ if (empty($xml)) {
     processEDOSch301($xml);
 }
 
-
-function uploadXml($data)
+function loadXml($path)
 {
-    $path = $data['tmp_name'];
     return simplexml_load_file($path);
 }
 
