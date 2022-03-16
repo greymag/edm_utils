@@ -32,24 +32,64 @@ function processEDOSch301(SimpleXMLElement $xml)
 {
     $name = $xml->getName();
     if ($name != 'Файл' ||  $xml['Формат'] != 'ЭДОСч' || $xml['ВерсияФормата'] != '3.01') {
-        die('Файл не соответсвует формату ЭДОСч версии 3.01');
+        die('Файл не соответствует формату ЭДОСч версии 3.01');
     }
 
     $doc = $xml->Документ;
     $provider = $doc->Поставщик;
+	$providerBank = $provider->БанкРекв;
+	$providerInfo = $provider->СвЮЛ;
     $customer = $doc->Покупатель;
     $invoce = $doc->ТаблДок;
     $total = $invoce->ИтогТабл;
     $totalVat = $total->НДС;
     $hasVat = !empty($totalVat) && !empty((float)$totalVat['СУММА']);
     
-    $title = $doc['Название'] . ' №' . $doc['Номер'] . ' от ' . $doc['Дата']; ?>
+    $title = $doc['Название'] . ' №' . $doc['Номер'] . ' от ' . $doc['Дата'];
+?>
 <head>
 	<title><?=$title; ?></title>
+	<style>
+		table {
+        	border-collapse: collapse;
+		}
+		td {
+			border: solid 1px black;
+			border-spacing: 0;
+			padding: 2px;
+		}
+	</style>
 </head>
 <body>
 	<article>
-		TODO: таблица реквизитов
+		<table>
+			<tr>
+				<td colspan="4" rowspan="2"><?=$providerBank['НаимБанк'];?></td>
+				<td>БИК</td>
+				<td><?=$providerBank['БИК'];?></td>
+			</tr>
+			<tr>
+				<td rowspan="2">Сч. №</td>
+				<td rowspan="2"><?=$providerBank['КСчет'];?></td>
+			</tr>
+			<tr>
+				<td colspan="4">Банк получателя</td>
+			</tr>
+			<tr>
+				<td>ИНН</td>
+				<td><?=$providerInfo['ИНН'];?></td>
+				<td>КПП</td>
+				<td><?=$providerInfo['КПП'];?></td>
+				<td rowspan="3">Сч. №</td>
+				<td rowspan="3"><?=$providerBank['РСчет'];?></td>
+			</tr>
+			<tr>
+				<td colspan="4"><?=$providerInfo['Название'];?></td>
+			</tr>
+			<tr>
+				<td colspan="4">Получатель</td>
+			</tr>
+		</table>
 		<h1><?=$title; ?></h1>
 		TODO: поставщик
 		TODO: покупатель
