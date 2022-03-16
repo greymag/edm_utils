@@ -24,6 +24,16 @@ function uploadXml($data)
     return simplexml_load_file($path);
 }
 
+function findValue($items, $name) 
+{
+	foreach ($items as $item) 
+	{
+		if ($item['Имя'] == $name) return $item['Значение'];
+	}
+
+	return null;
+}
+
 /**
  * Парсит и выводит в нормально виде ЭДОСч (счет)
  * https://sbis.ru/formats/docFormatCardEdo/47273/format/
@@ -39,21 +49,29 @@ function processEDOSch301(SimpleXMLElement $xml)
     $provider = $doc->Поставщик;
 	$providerBank = $provider->БанкРекв;
 	$providerInfo = $provider->СвЮЛ;
+	$providerAddress = $provider->Адрес;
     $customer = $doc->Покупатель;
+	$customerInfo = $customer->СвЮЛ;
+	$customerAddress = $customer->Адрес;
+	$customerContact = $customer->Контакт;
+	$contract = $doc->Параметр;
     $invoce = $doc->ТаблДок;
     $total = $invoce->ИтогТабл;
     $totalVat = $total->НДС;
     $hasVat = !empty($totalVat) && !empty((float)$totalVat['СУММА']);
+
+	$contractNum = findValue($contract, 'ДоговорНомер');
+	$contractDate = findValue($contract, 'ДоговорДата');
     
     $title = $doc['Название'] . ' №' . $doc['Номер'] . ' от ' . $doc['Дата'];
 ?>
 <head>
 	<title><?=$title; ?></title>
 	<style>
-		table {
+		table.bordered {
         	border-collapse: collapse;
 		}
-		td {
+		table.bordered th, table.bordered td {
 			border: solid 1px black;
 			border-spacing: 0;
 			padding: 2px;
@@ -62,7 +80,7 @@ function processEDOSch301(SimpleXMLElement $xml)
 </head>
 <body>
 	<article>
-		<table>
+		<table class="bordered">
 			<tr>
 				<td colspan="4" rowspan="2"><?=$providerBank['НаимБанк'];?></td>
 				<td>БИК</td>
@@ -90,11 +108,25 @@ function processEDOSch301(SimpleXMLElement $xml)
 				<td colspan="4">Получатель</td>
 			</tr>
 		</table>
+		
 		<h1><?=$title; ?></h1>
-		TODO: поставщик
-		TODO: покупатель
-		TODO: Основание
+
 		<table>
+			<tr>
+				<td>Поставщик (Исполнитель):</td>
+				<td><?=$provider['Название']?>, ИНН <?=$providerInfo['ИНН']?>, КПП <?=$providerInfo['КПП']?>, <?=$providerAddress['АдрТекст']?></td>
+			</tr>
+			<tr>
+				<td>Покупатель (Заказчик):</td>
+				<td><?=$customer['Название']?>, ИНН <?=$customerInfo['ИНН']?>, КПП <?=$customerInfo['КПП']?>, <?=$customerAddress['АдрТекст']?>, тел.: <?=$customerContact['Телефон']?></td>
+			</tr>
+			<tr>
+				<td>Основание:</td>
+				<td>Договор № <?=$contractNum;?> от <?=$contractDate;?></td>
+			</tr>
+		</table>
+		
+		<table class="bordered">
 			<tr>
 				<th>№</th>
 				<th>Код</th>
