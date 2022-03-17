@@ -14,6 +14,7 @@ if (isset($_FILES['xml'])) {
 
     switch ($fileType) {
         case 'application/zip':
+		case 'application/x-zip-compressed':
             require_once __DIR__ . DIRECTORY_SEPARATOR . 'unzip.php';
             $path = unzip_xml($tmpPath);
             if (!empty($path)) {
@@ -32,7 +33,7 @@ if (isset($_FILES['xml'])) {
             }
             break;
         default:
-            $error = 'Неподдерживаемый тип файла.';
+            $error = 'Неподдерживаемый тип файла: ' . $fileType . '.';
     }
 }
 
